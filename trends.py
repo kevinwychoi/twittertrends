@@ -38,17 +38,17 @@ def make_tweet(text, time, lat, lon):
 def tweet_text(tweet):
     """Return a string, the words in the text of a tweet."""
     "*** YOUR CODE HERE ***"
-    return make_tweet['text']
+    return tweet['text']
 
 def tweet_time(tweet):
     """Return the datetime representing when a tweet was posted."""
     "*** YOUR CODE HERE ***"
-    return make_tweet['time']
+    return tweet['time']
 
 def tweet_location(tweet):
     """Return a position representing a tweet's location."""
     "*** YOUR CODE HERE ***"
-    return [make_tweet['latitude'], make_tweet['longitude']]
+    return [tweet['latitude'], tweet['longitude']]
 
 # The tweet abstract data type, implemented as a function.
 
@@ -65,6 +65,18 @@ def make_tweet_fn(text, time, lat, lon):
     """
     "*** YOUR CODE HERE ***"
     # Please don't call make_tweet in your solution
+    
+    def dispatch(message):
+        if message == 'text':
+            return text
+        elif message == 'time':
+            return time
+        elif message == 'lat':
+            return lat
+        elif message == 'lon':
+            return lon
+    return dispatch
+
 
 def tweet_text_fn(tweet):
     """Return a string, the words in the text of a functional tweet."""
@@ -105,22 +117,35 @@ def extract_words(text):
     ['cat', 'on', 'my', 'keyboard']
     """
     "*** YOUR CODE HERE ***"
-    return text.split()  # You may wish to change this line.
+    stringlist = list(text)
+
+    for i in range(len(stringlist)):
+        if stringlist[i] not in ascii_letters:
+            stringlist[i] = ' '
+
+    words = "".join(stringlist)
+    return words.split()  # You may wish to change this line.
 
 def make_sentiment(value):
     """Return a sentiment, which represents a value that may not exist.
     """
     assert value is None or (value >= -1 and value <= 1), 'Illegal sentiment value'
     "*** YOUR CODE HERE ***"
+    return value
 
 def has_sentiment(s):
     """Return whether sentiment s has a value."""
     "*** YOUR CODE HERE ***"
+    if type(s) == int or type(s) == float:
+        return True
+    else:
+        return False
 
 def sentiment_value(s):
     """Return the value of a sentiment s."""
     assert has_sentiment(s), 'No sentiment value'
     "*** YOUR CODE HERE ***"
+    return make_sentiment(s)
 
 def get_word_sentiment(word):
     """Return a sentiment representing the degree of positive or negative
@@ -157,9 +182,21 @@ def analyze_tweet_sentiment(tweet):
     False
     """
     # You may change any of the lines below.
-    average = make_sentiment(None)
+    average = 0
+    sentimental_values = 0
     "*** YOUR CODE HERE ***"
-    return average
+    words = tweet_words(tweet)
+    for word in words:
+        if get_word_sentiment(word) == None:
+            value = 0
+        else:
+            value = get_word_sentiment(word)
+            sentimental_values = sentimental_values + 1
+        average = average + value
+    if average == 0:
+        return None
+    else:
+        return average/sentimental_values
 
 
 #################################
@@ -189,6 +226,23 @@ def find_centroid(polygon):
     (1.0, 2.0, 0.0)
     """
     "*** YOUR CODE HERE ***"
+    n = len(polygon) - 1
+    area = 0
+    centroid_lat = 0
+    centroid_lon = 0
+
+    for i in range(0, n):
+        area = area + 0.5*(polygon[i][0]*polygon[i+1][1] - polygon[i+1][0]*polygon[i][1])
+
+    if area == 0:
+        return polygon[0][0], polygon[0][1], area
+
+    else:
+        for i in range(0, n):
+            centroid_lat = centroid_lat + 1/(6*area)*(polygon[i][0] + polygon[i+1][0])*(polygon[i][0]*polygon[i+1][1] - polygon[i+1][0]*polygon[i][1])
+            centroid_lon = centroid_lon + 1/(6*area)*(polygon[i][1] + polygon[i+1][1])*(polygon[i][0]*polygon[i+1][1] - polygon[i+1][0]*polygon[i][1])
+        return centroid_lat, centroid_lon, abs(area)
+
 
 def find_state_center(polygons):
     """Compute the geographic center of a state, averaged over its polygons.
