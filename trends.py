@@ -266,6 +266,13 @@ def find_state_center(polygons):
     -156.21763
     """
     "*** YOUR CODE HERE ***"
+    Cx, Cy, total_A = 0, 0, 0
+    for polygon in polygons:
+        [lat, lon, A] = find_centroid(polygon)
+        Cx, Cy, total_A = Cx + lat*A, Cy + lon*A, total_A + A
+    Cx, Cy = Cx/total_A, Cy/total_A
+    return Cx, Cy
+
 
 
 ###################################
